@@ -4,7 +4,7 @@ Provides an adapter for translating between Agent C message formats and Zep Clou
 """
 
 from typing import Any, Dict, List, Optional
-from .base_adapter import BaseAdapter
+from agent_c_session.adapters.base_adapter import BaseAdapter
 
 
 class ZepAdapter(BaseAdapter):

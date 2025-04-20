@@ -1,9 +1,9 @@
 """Basic usage example for the Agent C Session Manager."""
 
 import asyncio
-from agent_c.session.repositories.chat_session_repo import ChatSessionRepo
-from agent_c.session.models.chat_user import ChatUser
-from agent_c.session.models.chat_session import ChatMessage
+from agent_c_session.repositories.chat_session_repo import ChatSessionRepo
+from agent_c_session.models import ChatUser
+from agent_c_session.models import ChatMessage
 
 
 async def main():

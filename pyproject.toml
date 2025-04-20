@@ -71,4 +71,5 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
-addopts = "--cov=agent_c.session --cov-report=term-missing -v"
+asyncio_default_fixture_loop_scope = "function"
+addopts = "--cov=agent_c_session --cov-report=term-missing -v"

@@ -2,10 +2,14 @@
 
 Provides methods for managing chat users and sessions with Zep Cloud as the backend.
 """
-
+import os
 from typing import Any, Dict, List, Optional, Union
-from ..models.chat_user import ChatUser
-from ..models.chat_session import ChatSession
+from agent_c_session.models.chat_user import ChatUser
+from agent_c_session.models.chat_session import ChatSession
+from zep_cloud.client import AsyncZep
+from zep_cloud.errors import NotFoundError, InternalServerError, BadRequestError, UnauthorizedError
+
+from agent_c.util.slugs import MnemonicSlugs
 
 
 class ChatSessionRepo:
@@ -18,15 +22,19 @@ class ChatSessionRepo:
         zep_client: Client for interacting with Zep Cloud API
     """
     
-    def __init__(self, zep_api_url: str, zep_api_key: str):
+    def __init__(self, zep_client: Optional[AsyncZep] = None, zep_api_key: Optional[str] = None):
         """Initialize the chat session repository.
         
         Args:
-            zep_api_url: URL of the Zep Cloud API
-            zep_api_key: API key for authenticating with Zep Cloud
+            zep_client: A zep client instance for interacting with Zep Cloud API
+            zep_api_key: API key for authenticating with Zep Cloud if not client provided
+                         Will be pulled from ZEP_API_KEY env variable if not provided
         """
-        # Implementation to be added
-        pass
+        if not zep_client:
+            api_key = zep_api_key or os.getenv("ZEP_API_KEY")
+            zep_client = AsyncZep(api_key=api_key)
+
+        self.zep_client = zep_client
     
     async def add_chat_user(self, user: ChatUser, initial_metadata: Optional[Dict[str, Any]] = None) -> ChatUser:
         """Add a new chat user.

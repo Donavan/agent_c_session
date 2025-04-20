@@ -1,9 +1,8 @@
 """Unit tests for the ChatUser model."""
 
-import pytest
-from datetime import datetime
-from agent_c.session.models.chat_user import ChatUser
-
+from agent_c_session.models import ChatUser
+from dotenv import load_dotenv
+load_dotenv(override=True)
 
 class TestChatUser:
     """Test suite for the ChatUser model."""

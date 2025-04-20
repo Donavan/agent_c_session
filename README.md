@@ -21,9 +21,10 @@ pip install agent-c-session
 
 ```python
 import asyncio
-from agent_c.session.repositories.chat_session_repo import ChatSessionRepo
-from agent_c.session.models.chat_user import ChatUser
-from agent_c.session.models.chat_session import ChatMessage
+from agent_c_session.repositories.chat_session_repo import ChatSessionRepo
+from agent_c_session.models import ChatUser
+from agent_c_session.models import ChatMessage
+
 
 async def main():
     # Initialize the repository with Zep Cloud credentials
@@ -31,7 +32,7 @@ async def main():
         zep_api_url="https://api.zep.us/v2",
         zep_api_key="your_api_key_here"
     )
-    
+
     # Create a user
     user = await repo.add_chat_user(ChatUser(
         username="john_doe",
@@ -39,31 +40,32 @@ async def main():
         first_name="John",
         last_name="Doe"
     ))
-    
+
     # Create a new session
     session = await repo.new_session(
         username="john_doe",
         title="Getting Started"
     )
-    
+
     # Add messages to the session
     await session.add_message(ChatMessage(
         role="user",
         content="Hello, Agent C!"
     ))
-    
+
     await session.add_message(ChatMessage(
         role="assistant",
         content="Hello! How can I help you today?"
     ))
-    
+
     # Get messages from the session
     messages = await session.get_messages(limit=10)
     for msg in messages:
         print(f"{msg.role}: {msg.content}")
-    
+
     # Flush changes to Zep Cloud
     await session.flush()
+
 
 # Run the example
 asyncio.run(main())

@@ -19,7 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "pydantic>=2.9.2",
-    "zep-python>=2.10.1",
+    "zep-cloud>=2.10.1",
     "asyncio",
     "aiohttp"
 ]

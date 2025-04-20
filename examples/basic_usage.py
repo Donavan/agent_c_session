@@ -1,6 +1,11 @@
 """Basic usage example for the Agent C Session Manager."""
 
 import asyncio
+from dotenv import load_dotenv
+from zep_cloud.client import AsyncZep
+
+load_dotenv(override=True)
+
 from agent_c_session.repositories.chat_session_repo import ChatSessionRepo
 from agent_c_session.models import ChatUser
 from agent_c_session.models import ChatMessage
@@ -9,19 +14,18 @@ from agent_c_session.models import ChatMessage
 async def main():
     """Demonstrate basic usage of the Agent C Session Manager."""
     # Initialize the repository with Zep Cloud credentials
-    repo = ChatSessionRepo(
-        zep_api_url="https://api.zep.us/v2",
-        zep_api_key="your_api_key_here"
-    )
+    zep_client = AsyncZep()
+
+    repo = ChatSessionRepo(zep_client)
     
     # Create a user
     user = await repo.add_chat_user(ChatUser(
-        username="john_doe",
+        user_id="john_doe",
         email="john@example.com",
         first_name="John",
         last_name="Doe"
     ))
-    print(f"Created user: {user.username}")
+    print(f"Created user: {user.user_id}")
     
     # Create a new session
     session = await repo.new_session(

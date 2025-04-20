@@ -8,8 +8,9 @@ from agent_c_session.models.chat_user import ChatUser
 from agent_c_session.models.chat_session import ChatSession
 from zep_cloud.client import AsyncZep
 from zep_cloud.errors import NotFoundError, InternalServerError, BadRequestError, UnauthorizedError
-
 from agent_c.util.slugs import MnemonicSlugs
+
+import zep_cloud.types as zep_types
 
 
 class ChatSessionRepo:
@@ -36,7 +37,7 @@ class ChatSessionRepo:
 
         self.zep_client = zep_client
     
-    async def add_chat_user(self, user: ChatUser, initial_metadata: Optional[Dict[str, Any]] = None) -> ChatUser:
+    async def add_chat_user(self, user: ChatUser) -> ChatUser:
         """Add a new chat user.
         
         Args:
@@ -44,15 +45,17 @@ class ChatSessionRepo:
             initial_metadata: Optional initial metadata for the user
             
         Returns:
-            The created ChatUser
+            The created ChatUser with a pounding Zep user object
             
         Raises:
             ValueError: If a user with the same username already exists
         """
-        # Implementation to be added
-        pass
+        user.zep_user = await self.zep_client.user.add(**user.model_dump())
+
+        return user
+
     
-    async def update_chat_user(self, user: ChatUser) -> ChatUser:
+    async def update_chat_user_info(self, user: ChatUser) -> ChatUser:
         """Update an existing chat user.
         
         Args:
@@ -64,28 +67,26 @@ class ChatSessionRepo:
         Raises:
             ValueError: If the user doesn't exist
         """
-        # Implementation to be added
-        pass
+        user.zep_user = await self.zep_client.user.update(first_name=user.first_name, last_name=user.last_name,
+                                                           email=user.email, user_id=user.user_id)
+        return user
     
-    async def delete_chat_user(self, username: str, hard_delete: bool = False) -> None:
+    async def delete_chat_user(self, user_id: str) -> None:
         """Delete a chat user.
         
         Args:
-            username: Username of the user to delete
-            hard_delete: If True, permanently delete the user and all their sessions;
-                         if False, just mark the user as inactive
-                         
+            usernuser_idame: Username of the user to delete
+
         Raises:
             ValueError: If the user doesn't exist
         """
-        # Implementation to be added
-        pass
+        await self.zep_client.user.delete(user_id=user_id)
     
-    async def get_chat_user(self, username: str) -> ChatUser:
-        """Get a chat user by username.
+    async def get_chat_user(self, user_id: str) -> ChatUser:
+        """Get a chat user by user_id.
         
         Args:
-            username: Username of the user to retrieve
+            username: user_id of the user to retrieve
             
         Returns:
             The requested ChatUser
@@ -93,8 +94,7 @@ class ChatSessionRepo:
         Raises:
             ValueError: If the user doesn't exist
         """
-        # Implementation to be added
-        pass
+        return ChatUser.from_zep(await self.zep_client.user.get(user_id=user_id))
     
     async def get_user_sessions(self, username: str, limit: int = 10, offset: int = 0) -> List[ChatSession]:
         """Get chat sessions for a user.

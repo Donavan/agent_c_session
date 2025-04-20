@@ -5,7 +5,7 @@ Provides an abstraction over the Zep user object with additional metadata manage
 
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
-
+import zep_cloud.types as zep_types
 
 class ChatUser(BaseModel):
     """Represents a chat user in the Agent C system.
@@ -14,7 +14,7 @@ class ChatUser(BaseModel):
     managing user data and associated sessions.
     
     Attributes:
-        username: Unique identifier for the user
+        user_id: Unique identifier for the user
         email: User's email address
         first_name: User's first name
         last_name: User's last name
@@ -22,18 +22,31 @@ class ChatUser(BaseModel):
         managed_metadata: Structured metadata with controlled access
     """
     
-    username: str = Field(..., description="Unique identifier for the user")
+    user_id: str = Field(..., description="Unique identifier for the user")
     email: Optional[str] = Field(None, description="User's email address")
     first_name: Optional[str] = Field(None, description="User's first name")
-    last_name: Optional[str] = Field(None, description="User's last name")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="General user metadata")
-    managed_metadata: Dict[str, str] = Field(default_factory=dict, 
-                                           description="Structured metadata with controlled access")
-    
-    def update_data(self) -> None:
-        """Update the non-username parts of a user record in Zep."""
-        # Implementation to be added
-        pass
+    last_name: Optional[str] = Field(None, description="User's last name")
+    zep_user: Optional[zep_types.User] = Field(None, description="Zep user object")
+
+    @classmethod
+    def from_zep(cls, zep_user: zep_types.User) -> "ChatUser":
+        """Create a ChatUser instance from a Zep user object.
+
+        Args:
+            zep_user: Zep user object
+
+        Returns:
+            ChatUser instance
+        """
+        return cls(
+            user_id=zep_user.user_id,
+            email=zep_user.email,
+            first_name=zep_user.first_name,
+            last_name=zep_user.last_name,
+            metadata=zep_user.metadata or {},
+            zep_user=zep_user
+        )
     
     def get_sessions(self, limit: int = 10, offset: int = 0) -> List["ChatSession"]:
         """Return a list of chat sessions for this user.

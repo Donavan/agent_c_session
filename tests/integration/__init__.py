@@ -1,0 +1,1 @@
+# Integration tests for Agent C Session Manager

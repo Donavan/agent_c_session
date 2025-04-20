@@ -1,0 +1,1 @@
+# Tests for Agent C Session Manager

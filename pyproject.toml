@@ -21,7 +21,8 @@ dependencies = [
     "pydantic>=2.9.2",
     "zep-cloud>=2.10.1",
     "asyncio",
-    "aiohttp"
+    "aiohttp",
+    "agent-c-core>=0.1.2",
 ]
 
 [project.optional-dependencies]

@@ -58,8 +58,12 @@ class ChatUser(BaseModel):
         Returns:
             List of ChatSession objects belonging to this user
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        if not self.zep_user:
+            raise ValueError("Zep user object is not loaded")
+        sessions = self.zep_user.sessions[offset:offset + limit]
+        from src.agent_c_session.models.chat_session import ChatSession
+        return [ChatSession.from_zep(session) for session in sessions]
     
     def search_sessions(self, query: str, limit: int = 10) -> List["ChatSession"]:
         """Search for chat sessions using the Zep search API.
@@ -71,8 +75,15 @@ class ChatUser(BaseModel):
         Returns:
             List of ChatSession objects matching the search criteria
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        if not self.zep_user or not self.zep_user.sessions:
+            raise ValueError("Zep user sessions are not loaded")
+
+        filtered_sessions = [session for session in self.zep_user.sessions if
+                             query.lower() in (session.metadata.get("title", "").lower())]
+
+        from src.agent_c_session.models.chat_session import ChatSession
+        return [ChatSession.from_zep(session) for session in filtered_sessions[:limit]]
     
     def get_meta(self, key: str, default: Any = None) -> Any:
         """Get a value from the user metadata.
@@ -106,8 +117,9 @@ class ChatUser(BaseModel):
         Returns:
             Value associated with the namespace and key, or default
         """
-        # Implementation to be added
-        pass
+        managed = self.metadata.get("managed", {})
+        namespace_data = managed.get(namespace, {})
+        return namespace_data.get(key, default)
     
     def set_managed_meta(self, namespace: str, key: str, value: Any) -> None:
         """Set a value in the managed metadata under a namespace.
@@ -117,8 +129,13 @@ class ChatUser(BaseModel):
             key: Metadata key within the namespace
             value: Value to store
         """
-        # Implementation to be added
-        pass
+        if "managed" not in self.metadata:
+            self.metadata["managed"] = {}
+
+        if namespace not in self.metadata["managed"]:
+            self.metadata["managed"][namespace] = {}
+
+        self.metadata["managed"][namespace][key] = value
     
     def get_tool_metadata(self, tool_name: str, key: str, default: Any = None) -> Any:
         """Helper method to get tool-specific metadata.

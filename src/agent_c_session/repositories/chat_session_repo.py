@@ -4,8 +4,8 @@ Provides methods for managing chat users and sessions with Zep Cloud as the back
 """
 import os
 from typing import Any, Dict, List, Optional, Union
-from agent_c_session.models.chat_user import ChatUser
-from agent_c_session.models.chat_session import ChatSession
+from src.agent_c_session.models.chat_user import ChatUser
+from src.agent_c_session.models.chat_session import ChatSession
 from zep_cloud.client import AsyncZep
 from zep_cloud.errors import NotFoundError, InternalServerError, BadRequestError, UnauthorizedError
 from agent_c.util.slugs import MnemonicSlugs
@@ -90,7 +90,7 @@ class ChatSessionRepo:
             
         Returns:
             The requested ChatUser
-            
+
         Raises:
             ValueError: If the user doesn't exist
         """
@@ -110,8 +110,9 @@ class ChatSessionRepo:
         Raises:
             ValueError: If the user doesn't exist
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        sessions = await self.zep_client.memory.list_sessions(user_id=username, limit=limit, offset=offset)
+        return [ChatSession.from_zep(session) for session in sessions]
     
     async def search_user_sessions(self, username: str, query: str, limit: int = 10) -> List[ChatSession]:
         """Search for chat sessions for a user.
@@ -127,8 +128,9 @@ class ChatSessionRepo:
         Raises:
             ValueError: If the user doesn't exist
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        sessions = await self.zep_client.memory.search_sessions(user_id=username, text=query, limit=limit)
+        return [ChatSession.from_zep(session) for session in sessions]
     
     async def get_user_session(self, username: str, session_id: str) -> ChatSession:
         """Get a specific chat session for a user.
@@ -143,8 +145,9 @@ class ChatSessionRepo:
         Raises:
             ValueError: If the user or session doesn't exist
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        session = await self.zep_client.memory.get_session(user_id=username,session_id=session_id)
+        return ChatSession.from_zep(session)
     
     async def remove_user_session(self, username: str, session_id: str) -> None:
         """Remove a chat session for a user.
@@ -156,8 +159,8 @@ class ChatSessionRepo:
         Raises:
             ValueError: If the user or session doesn't exist
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        await self.zep_client.memory.delete_session(user_id=username,session_id=session_id)
     
     async def new_session(self, username: str, title: Optional[str] = None, 
                          initial_metadata: Optional[Dict[str, Any]] = None) -> ChatSession:
@@ -174,5 +177,10 @@ class ChatSessionRepo:
         Raises:
             ValueError: If the user doesn't exist
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        session = await self.zep_client.memory.add_session(
+            user_id=username,
+            metadata=initial_metadata or {},
+            title=title
+        )
+        return ChatSession.from_zep(session)

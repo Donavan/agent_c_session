@@ -6,9 +6,9 @@ from zep_cloud.client import AsyncZep
 
 load_dotenv(override=True)
 
-from agent_c_session.repositories.chat_session_repo import ChatSessionRepo
-from agent_c_session.models import ChatUser
-from agent_c_session.models import ChatMessage
+from src.agent_c_session.repositories.chat_session_repo import ChatSessionRepo
+from src.agent_c_session.models.chat_user import ChatUser
+from src.agent_c_session.models import ChatMessage
 
 
 async def main():

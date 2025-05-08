@@ -6,7 +6,7 @@ Provides an abstraction over the Zep memory API for chat sessions.
 from typing import Any, Dict, List, Optional, Union
 from datetime import datetime
 from pydantic import BaseModel, Field
-
+import zep_cloud.types as zep_types
 
 class ChatMessage(BaseModel):
     """Represents a single message in a chat session.
@@ -66,6 +66,22 @@ class ChatSession(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict, description="General session metadata")
     managed_metadata: Dict[str, str] = Field(default_factory=dict, 
                                            description="Structured metadata with controlled access")
+    """Centric India Dev"""
+    _messages: List[ChatMessage] = Field(default_factory=list, description="Internal list of messages")
+    _tool_calls: List[ToolCall] = Field(default_factory=list, description="Internal list of tool calls")
+
+    @classmethod
+    def from_zep(cls, zep_session: zep_types.Session) -> "ChatSession":
+        """Create a ChatSession instance from a Zep session object."""
+        return cls(
+            session_id=zep_session.session_id,
+            user_id=zep_session.user_id,
+            title=zep_session.meta.get("title") if zep_session.meta else None,
+            created_at=zep_session.created_at,
+            updated_at=zep_session.updated_at,
+            metadata=zep_session.metadata or {},
+            managed_metadata=zep_session.managed_metadata or {}
+        )
     
     def add_message(self, message: Union[ChatMessage, Dict[str, Any]]) -> None:
         """Add a message to the chat session.
@@ -73,17 +89,21 @@ class ChatSession(BaseModel):
         Args:
             message: The message to add (either a ChatMessage object or a dict)
         """
-        # Implementation to be added
-        pass
-    
+        """Centric India Dev"""
+        if isinstance(message, dict):
+            message = ChatMessage(**message)
+        self._messages.append(message)
+        self.updated_at = datetime.now()
+
     def add_interaction(self, messages: List[Union[ChatMessage, Dict[str, Any]]]) -> None:
         """Add multiple messages as a single interaction to the chat session.
         
         Args:
             messages: List of messages to add
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        for msg in messages:
+            self.add_message(msg)
     
     def add_tool_call(self, tool_call: Union[ToolCall, Dict[str, Any]]) -> None:
         """Add a tool call to the chat session.
@@ -91,8 +111,11 @@ class ChatSession(BaseModel):
         Args:
             tool_call: The tool call to add (either a ToolCall object or a dict)
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        if isinstance(tool_call, dict):
+            tool_call = ToolCall(**tool_call)
+        self._tool_calls.append(tool_call)
+        self.updated_at = datetime.now()
     
     def get_messages(self, limit: int = 10, before_id: Optional[str] = None) -> List[ChatMessage]:
         """Get recent messages from the chat session.
@@ -104,8 +127,8 @@ class ChatSession(BaseModel):
         Returns:
             List of ChatMessage objects
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        return self._messages[-limit:]
     
     def get_meta(self, key: str, default: Any = None) -> Any:
         """Get a value from the session metadata.
@@ -140,8 +163,9 @@ class ChatSession(BaseModel):
         Returns:
             Value associated with the namespace and key, or default
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        namespaced_key = f"{namespace}:{key}"
+        return self.managed_metadata.get(namespaced_key, default)
     
     def set_managed_meta(self, namespace: str, key: str, value: Any) -> None:
         """Set a value in the managed metadata under a namespace.
@@ -151,8 +175,10 @@ class ChatSession(BaseModel):
             key: Metadata key within the namespace
             value: Value to store
         """
-        # Implementation to be added
-        pass
+        """Centric India Dev"""
+        namespaced_key = f"{namespace}:{key}"
+        self.managed_metadata[namespaced_key] = value
+        self.updated_at = datetime.now()
     
     def flush(self) -> None:
         """Flush all pending changes to the underlying storage."""
